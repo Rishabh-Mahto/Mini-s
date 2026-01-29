@@ -1,13 +1,14 @@
-import './App.css'
-import GridReverse from './components/grid-reverse'
+import "./App.css";
+import GridReverse from "./components/grid-reverse";
+import TicTacToe from "./components/tic-tac-toe";
 
 function App() {
-
   return (
     <>
-      <GridReverse />
+      {/* <GridReverse /> */}
+      <TicTacToe />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
