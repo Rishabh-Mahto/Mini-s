@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 export default function TicTacToe() {
   const [gridSize, setGridSize] = useState<number>(0);
   const [currentPlayer, setCurrentPlayer] = useState<"X" | "O">("X");
-  const [board, setBoard] = useState<string[]>([]);
+  const [board, setBoard] = useState<(string | null)[]>([]);
   const [winningCombinations, setWinningCombinations] = useState<number[][]>(
     [],
   );
@@ -55,6 +55,7 @@ export default function TicTacToe() {
   ];
 
   const handleClick = (index: number) => {
+    if (winner) return;
     console.log("Clicked Cell Index:", index);
     if (board[index]) return; // Prevent overwriting a cell
 
@@ -67,14 +68,38 @@ export default function TicTacToe() {
     setCurrentPlayer((prev) => (prev === "X" ? "O" : "X"));
   };
 
-  const checkWinner = () => {};
+  const resetGame = () => {
+    setBoard(Array(gridSize * gridSize).fill(null));
+    setCurrentPlayer("X");
+    setWinner(null);
+  };
+
+  const checkWinner = () => {
+    for (const combination of winningCombinations) {
+      const [firstIndex, ...restIndices] = combination;
+      const firstValue = board[firstIndex];
+      if (
+        firstValue &&
+        restIndices.every((index) => board[index] === firstValue)
+      ) {
+        return firstValue;
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    const gameWinner = checkWinner();
+    if (gameWinner) {
+      setWinner(gameWinner);
+    }
+  }, [board]);
 
   useEffect(() => {
     if (!gridSize) return;
 
     setWinningCombinations(genrateWinningCombinations(gridSize));
-    setBoard(Array(gridSize * gridSize).fill(null));
-    setCurrentPlayer("X");
+    resetGame();
   }, [gridSize]);
 
   return (
@@ -84,10 +109,8 @@ export default function TicTacToe() {
         {" "}
         <select
           onChange={(e) => {
-            setBoard([]);
+            resetGame();
             setGridSize(Number(e.target.value));
-            setCurrentPlayer("X");
-            setWinner(null);
           }}
           className="border border-black px-2 py-1 rounded"
         >
@@ -104,15 +127,14 @@ export default function TicTacToe() {
         </select>
         <button
           className="cursor-pointer border border-black p-1 text-xs rounded bg-black text-white"
-          onClick={() => {
-            setBoard([]);
-            setCurrentPlayer("X");
-            setWinner(null);
-          }}
+          onClick={() => resetGame()}
         >
           Reset
         </button>
       </div>
+      {!winner && gridSize > 0 && (
+        <p className="mt-2">Current Player: {currentPlayer}</p>
+      )}
       <div
         className="mt-4 gap-2 grid"
         style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
