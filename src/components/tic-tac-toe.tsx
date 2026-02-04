@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function TicTacToe() {
   const [gridSize, setGridSize] = useState<number>(0);
@@ -34,12 +34,14 @@ export default function TicTacToe() {
 
     //diagonals
     const winDiag1: number[] = [];
+    // [[0,4,8]]
     for (let i = 0; i < size; i++) {
       winDiag1.push(i * size + i);
     }
     combinations.push(winDiag1);
 
     const winDiag2: number[] = [];
+    // [[2,4,6]]
     for (let i = 0; i < size; i++) {
       winDiag2.push(i * size + (size - 1 - i));
     }
@@ -56,7 +58,6 @@ export default function TicTacToe() {
 
   const handleClick = (index: number) => {
     if (winner) return;
-    console.log("Clicked Cell Index:", index);
     if (board[index]) return; // Prevent overwriting a cell
 
     setBoard((prev) => {
@@ -76,11 +77,12 @@ export default function TicTacToe() {
 
   const checkWinner = () => {
     for (const combination of winningCombinations) {
-      const [firstIndex, ...restIndices] = combination;
-      const firstValue = board[firstIndex];
+      //eg: [0,1,2]
+      const [firstIndex, ...restIndices] = combination; //eg: [0,1,2] => firstIndex=0, restIndices=[1,2]
+      const firstValue = board[firstIndex]; //"X" or "O" or null
       if (
         firstValue &&
-        restIndices.every((index) => board[index] === firstValue)
+        restIndices.every((index) => board[index] === firstValue) //eg: board[1] === "X" && board[2] === "X"
       ) {
         return firstValue;
       }
